@@ -1,0 +1,36 @@
+header {
+   grid-column: 1/12;
+
+}
+
+main {
+   grid-row: 2;
+
+   /* center */
+   width: 500px;
+   justify-self: center;
+   
+}
+   main h1 {
+      text-align: center;
+   }
+
+   main form {
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      grid-column-gap: 5px;
+      grid-row-gap: 5px;
+   }
+
+   main form input {
+      grid-column: 2;
+   }
+
+   main form label {
+      grid-column: 1;
+      text-align: right;
+   }
+
+footer {
+   grid-row: 3;
+}
