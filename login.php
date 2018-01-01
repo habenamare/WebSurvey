@@ -1,47 +1,68 @@
 <?php
+
    // constants for 'header.php'
    const TITLE = 'WebSurvey | Login';
    const ADMIN_PAGE = false;
+
    const DB_ACCESS = true;
    const STYLESHEETS = [
       'css/login.css'
    ];
 
-   require('includes/header.php');
+   require_once(__DIR__ . '/includes/header.php');
+
+
+   /* if the user is logged in, then redirect
+      REMEMBER: session_start() is in 'header.php', so 'header.php' must be
+                included before running this piece of code.
+   */
+   if (isset($_SESSION['username'])) {
+      Utils::redirect('index.php');
+   }
+
+   // require 'validation.inc.php' for validating user inputs
+   require(__DIR__ . '/includes/validation.inc.php');
+   // flags for displaying error messages
+   $invalid_input = false;
+   $invalid_combination = false;
 ?>
+
 
 <?php // form submission
    // check if the form is submitted
-   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+   if (isset($_POST['username']) && isset($_POST['password'])) {
 
-      // validate $_POST['user'] and $_POST['pass']
-      if ( Database.validate_username_input($_POST['username'])
-               && Database.validate_password_input($_POST['password'])) {
+      // validate $_POST['username'] and $_POST['password']
+      if ( validate_username($_POST['username'])
+            && validate_password($_POST['password'])) {
          
          // if validation succeeds, then authenticate
-         if (Database.authenticate($_POST['username'], $_POST['password'])) {
+         if (Database::authenticate($_POST['username'], $_POST['password'])) {
             print('login successful');
+            $_SESSION['username'] = 'haben';
+            Utils::redirect('index.php');
          } else {
-            print('login failed');
+            // invalid username and password combination, set flag to display error
+            $invalid_combination = true;
          }
 
       } else {
-         // incorrect submission, display error
+         // incorrect submission, set flag to display error
+         $invalid_input = true;
       }
    
    }
 ?>
 
-<?php
-// SESSION Test , Remove if not needed
-//    $_SESSION['user'] = 'haben';
-//    unset($_SESSION['user']);
 
-//    if (isset($_SESSION['user'])) {
-//       print('Logged In.');
-//    } else {
-//       print('Not Logged In.');
-//    }
+<?php // display error after checking $invalid_input or $invalid_combination
+   if ($invalid_input) {
+      print('<p class="error-message">Invalid username or password.</p>');
+      print('<p class="error-message">Please try again.</p>');
+   } else if ($invalid_combination) {
+      print('<p class="error-message">Invalid username and password combination.</p>');
+      print('<p class="error-message">Please try again.</p>');
+   }
 ?>
 
 <h1>Login</h1>
@@ -60,5 +81,5 @@
 
 
 <?php
-   require('includes/footer.php');
+   require(__DIR__ . '/includes/footer.php');
 ?>

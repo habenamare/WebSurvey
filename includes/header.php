@@ -21,19 +21,30 @@
 
    // start new or resume existing session
    session_start();
-   
-   // check if all mandatory constants are set
-      // if not, abort
 
+   // require utility class with reusable modules
+   require_once(__DIR__ . '/utils.inc.php');
+   
+   // check if all mandatory constants are set and if not, abort
+   if (!defined('TITLE') || !defined('ADMIN_PAGE')) {
+      Utils::error_occured('The page could not be loaded.');
+   }
+
+   // if the page needs authentication, check if the user is authenticated
+   if (ADMIN_PAGE == true) {
+      // if the user is not authenticated
+      if (!isset($_SESSION['username'])) {
+         // redirect to login page ('login.php')
+         header('Location: login.php');
+      }
+   }
 
    // check if the page wants DB access
    if (defined('DB_ACCESS')) {
       if (DB_ACCESS == true) {
-         // then, require('mariadb.inc.php')
+         require(__DIR__ . '/mariadb.inc.php');
       }
    }
-      // if DB_ACCESS == true
-         
 
 ?>
 <!doctype html>

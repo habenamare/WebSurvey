@@ -31,6 +31,10 @@ main {
       text-align: right;
    }
 
+.error-message {
+   color: red;
+}
+
 footer {
    grid-row: 3;
 }

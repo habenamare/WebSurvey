@@ -12,4 +12,10 @@
          exit('FROM Utility Class ' . $some_error);
       }
 
+      // a function to redirect to another page
+      public static function redirect($url) {
+         header('Location: ' . $url);
+         exit();
+      }
+
    }
