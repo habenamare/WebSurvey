@@ -13,6 +13,10 @@
    // This class contains static methods that perform database related tasks.  
    class Database {
       
+      // constants
+      // Used to check if result set returned from the database is empty.
+      public static $EMPTY_RESULT_SET = 3;
+
       private static $conn;
 
       public function __construct() {
@@ -42,12 +46,12 @@
       // returns TRUE if the $username exists in the database, otherwise returns FALSE
       public static function username_exists($username) {
          // execute SQL query using $username
-         $get_username = self::$conn->prepare('SELECT 1 FROM Researcher WHERE username=?');
-         $get_username->execute([ $username ]);
+         $statement = self::$conn->prepare('SELECT 1 FROM Researcher WHERE username=?');
+         $statement->execute([ $username ]);
          
          // if the username exists 1 will be selected , therefore 1 will be returned,
          // else false will be returned
-         return $get_username->fetchColumn();
+         return $statement->fetchColumn();
       } 
 
       /* Returns 'hashed_password' for the given $username from the database.
@@ -90,11 +94,36 @@
       // Surveys
       // --------------------------------------------------
 
-      // returns
+      /* Returns an array containing all Surveys.
+         A survey's attribute value can be obtained by using its attribute
+         name as key on the returned array.
+         Returns Database::$EMPTY_RESULT_SET if result set returned from the
+         database is empty.
+         Returns NULL if something goes wrong. 
+      */
       public static function get_surveys() {
+         try {
+            $statement = self::$conn->query('SELECT * FROM Survey');
+            $surveys = $statement->fetchAll();
 
+            // if returned result set is empty
+            if (count($surveys) == 0) {
+               //empty
+               return self::$EMPTY_RESULT_SET;
+            } else { // returned result set is not empty
+               return $surveys;
+            }
+
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+         
       }
 
+      //
+      public static function add_survey() {
+
+      }
 
 
    }

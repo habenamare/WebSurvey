@@ -1,0 +1,22 @@
+main h1 {
+   text-align: center;
+}
+
+.survey {
+   border: 1px solid #dbdbdb;
+   color: #222;
+   padding: 0px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-bottom: 15px;
+   margin-bottom: 15px;
+   box-shadow: 0 2px 5px #e8e8e8;
+}
+
+.survey-operations {
+   text-align: right;
+   color: #6e6e6e;
+}
+.survey-operations a {
+   color: #6e6e6e;
+}

@@ -1,16 +1,7 @@
 <?php
-   // constants for 'header.php'
-   const TITLE = 'WebSurvey | Home';
-   const ADMIN_PAGE = true;
    
-   require('includes/header.php');
-   //unset($_SESSION['username']);
-?>
+   // require utility class with reusable modules
+   require_once(__DIR__ . '/includes/utils.inc.php');
 
-<h1>WebSurvey Homepage</h1>
-
-<a href="logout.php">Log Out</a>
-
-<?php
-   require('includes/footer.php');
-?>
+   // makes 'surveys.php' the home(index) page
+   Utils::redirect('surveys.php');

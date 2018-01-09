@@ -13,8 +13,13 @@
 
       non-mandatory constants
          DB_ACCESS        boolean
-         NAV_LINKS        array of link title and the link itself pairs
+         NAV_LINKS        'navigation link name' and 'navigation location' pair arrays
+                           - collection of arrays like  [ 'name'     => 'Home,
+                                                          'location' => '#'   ]
+                           - an array represents a single navigation link                                                               
          ACTIVE_NAV_LINK  string (mandatory if NAV_LINK is defined)
+                           - The string should be name of the nav link that is active
+                             for this page.
          STYLESHEETS      array of css file paths
    */
 
@@ -84,23 +89,24 @@
       // dispaly navigation if (HAS_NAVIGATION == true)
       if (defined('NAV_LINKS') && defined('ACTIVE_NAV_LINK')) {
          
-         print('nav');
+         print('<nav>');
          print('<ul>');
    
          foreach (NAV_LINKS as $nav_link) {
             print('<li>');
 
-            if ($nav_link['title'] == ACTIVE_NAV_LINK) {
-               printf('<a href="%s" class="active">%s</a>', $nav_link['title'], $nav_link['link']);
+            if ($nav_link['name'] == ACTIVE_NAV_LINK) {
+               printf('<a href="%s" class="active">%s</a>', $nav_link['location'],
+                           $nav_link['name']);
             } else {
-               printf('<a href="%s">%s</a>', $nav_link['title'], $nav_link['link']);
+               printf('<a href="%s">%s</a>', $nav_link['location'], $nav_link['name']);
             }
 
             print('</li>');
          }
    
-         print('/<ul>');
-         print('/nav');
+         print('</ul>');
+         print('</nav>');
 
       }
    ?>
