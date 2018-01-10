@@ -154,6 +154,22 @@
          
       }
 
+      /* Adds a Respondent to the database using the given parameters.
+         Returns TRUE if everything goes well, returns NULL otherwise.
+      */
+      public static function add_respondent($first_name, $last_name, $email) {
+         $query = 'INSERT INTO Respondent (first_name, last_name, email)
+                   VALUES (?, ?, ?)';
+         
+         try {
+            $statement = self::$conn->prepare($query);
+            $statement->execute([$first_name, $last_name, $email]);
+            return true;
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+      }
+
 
    }
 

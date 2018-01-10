@@ -30,4 +30,34 @@
       return false;
    }
 
+   /*
+      Respondent 'first_name' or 'last_name' requirements:
+         - length: >=2 && <=20
+         - include only alphabetic characters (letters)    
+   */
+   function validate_respondent_name($name) {
+      $name_length = strlen($name);
+      if ($name_length >= 2 && $name_length <= 20) {
+         if (ctype_alpha($name)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /*
+      Respondent 'email' requirements:
+         - validates e-mail addresses against the syntax in RFC 822, with the
+           exceptions that comments and whitespace folding and dotless domain
+           names are not supported. (from php.net documentation of 'FILTER_VALIDATE_EMAIL') 
+   */
+   function validate_respondent_email($email) {
+      if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+         return true;
+      }
+
+      return false;
+   }
+
    
