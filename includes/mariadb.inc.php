@@ -91,11 +91,11 @@
 
 
       // --------------------------------------------------
-      // Surveys
+      // Survey
       // --------------------------------------------------
 
       /* Returns an array containing all Surveys.
-         A survey's attribute value can be obtained by using its attribute
+         A Survey's attribute value can be obtained by using its attribute
          name as key on the returned array.
          Returns Database::$EMPTY_RESULT_SET if result set returned from the
          database is empty.
@@ -108,7 +108,6 @@
 
             // if returned result set is empty
             if (count($surveys) == 0) {
-               //empty
                return self::$EMPTY_RESULT_SET;
             } else { // returned result set is not empty
                return $surveys;
@@ -123,6 +122,36 @@
       //
       public static function add_survey() {
 
+      }
+
+
+      // --------------------------------------------------
+      // Respondent
+      // --------------------------------------------------
+
+      /* Returns an array containing all Respondents.
+         A Respondent's attribute value can be obtained by using its attribute
+         name as key on the returned array.
+         Returns Database::$EMPTY_RESULT_SET if result set returned from the
+         database is empty.
+         Returns NULL if something goes wrong. 
+      */
+      public static function get_respondents() {
+         try {
+            $statement = self::$conn->query('SELECT * FROM Respondent');
+            $respondents = $statement->fetchAll();
+
+            // if returned result set is empty
+            if (count($respondents) == 0) {
+               return self::$EMPTY_RESULT_SET;
+            } else { // returned result set is not empty
+               return $respondents;
+            }
+
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+         
       }
 
 

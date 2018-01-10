@@ -20,3 +20,10 @@ main h1 {
 .survey-operations a {
    color: #6e6e6e;
 }
+
+#no-surveys {
+   text-align: center;
+   border: 1px solid #dbdbdb;
+   padding: 10px;
+   font-size: 1.3em;
+}

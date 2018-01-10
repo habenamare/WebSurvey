@@ -32,46 +32,44 @@
 
 <a href="new_survey.php" title="create new survey">create new</a>
 
-<section id="surveys-list">
+<?php
+   // get Surveys from the database
+   $surveys = Database::get_surveys();
 
-   <?php
-      // get Surveys from the database
-      $surveys = Database::get_surveys();
+   // if Surveys database retrieval successful
+   if ($surveys != NULL) {
 
-      // if Surveys database retrieval successful
-      if ($surveys != NULL) {
+      // if there is no Survey in the database
+      if ($surveys == Database::$EMPTY_RESULT_SET) {
 
-         // if there is no Survey in the database
-         if ($surveys == Database::$EMPTY_RESULT_SET) {
+         print('<p id="no-surveys">');
+         print('<strong>No Surveys.</strong> Surveys you created appear here.');
+         print('</p>');
 
-            print('No Surveys. Surveys you created appear here.');
+      } else { // Surveys retrieved from the database
 
-         } else { // Surveys retrieved from the database
+         foreach ($surveys as $survey) {
+            print('<section class="survey">');
+            printf('<h2>%s</h2>', $survey['name']);
 
-            foreach ($surveys as $survey) {
-               $hashed_survey_id = 1;
-               print('<section class="survey">');
-               printf('<h2>%s</h2>', $survey['name']);
-   
-               print('<div class="survey-operations">');
-               printf('<a href="view_result.php?id=%d" title="view result">View Result</a>',
-                        $survey['survey_id']);
-               printf('<a href="delete_survey.php?id=%d" title="delete this survey">Delete Survey</a>', $survey['survey_id']);
-               print('</div>');
-   
-               print('</section>');
-            }
+            print('<div class="survey-operations">');
+            printf('<a href="view_result.php?id=%d" title="view result">View Result</a>',
+                     $survey['survey_id']);
+            printf('<a href="delete_survey.php?id=%d" title="delete this survey">Delete Survey</a>', $survey['survey_id']);
+            print('</div>');
 
+            print('</section>');
          }
-  
-      } else { // Surveys database retrieval failed
-         // something went wrong when getting Surveys from the database
-         Utils::error_occured('Something went wrong. Please try again later.');
+
       }
 
+   } else { // Surveys database retrieval failed
+      // something went wrong when getting Surveys from the database
+      Utils::error_occured('Something went wrong. Please try again later.');
+   }
 
-   ?>
-</section>
+
+?>
 
 <?php
    require('includes/footer.php');
