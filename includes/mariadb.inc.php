@@ -155,7 +155,7 @@
       }
 
       /* Adds a Respondent to the database using the given parameters.
-         Returns TRUE if everything goes well, returns NULL otherwise.
+         Returns TRUE if the Respondent is added, Returns NULL otherwise.
       */
       public static function add_respondent($first_name, $last_name, $email) {
          $query = 'INSERT INTO Respondent (first_name, last_name, email)
@@ -170,6 +170,30 @@
          }
       }
 
+      /* Removes a Respondent in the database given $respondent_id. 
+         Returns TRUE if the Respondent is removed.
+         Returns NULL if trying to remove the Respondent was unsuccessful.
+      */
+      public static function remove_respondent($respondent_id) {
+         $query = 'DELETE FROM Respondent WHERE respondent_id=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $respondent_id and get rows
+            //affected by query
+            $statement->execute([$respondent_id]);
+            $rows_affected = $statement->rowCount();
+            
+            if ($rows_affected == 1) {
+               return true;
+            } else {
+               return NULL;
+            }
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
 
    }
 

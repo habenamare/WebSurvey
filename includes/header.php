@@ -21,6 +21,7 @@
                            - The string should be name of the nav link that is active
                              for this page.
          STYLESHEETS      array of css file paths
+         SCRIPTS          array of javascript file paths (used in 'footer.php')
    */
 
 
@@ -65,8 +66,7 @@
 
    <link rel="stylesheet" href="fonts/fonts.css">
    <link rel="stylesheet" href="css/_site.css">
-   <?php
-      // load stylesheets from the STYLESHEETS constant
+   <?php // load stylesheets from the STYLESHEETS constant
       if (defined('STYLESHEETS')) {
          foreach (STYLESHEETS as $style_sheet) {
             printf('<link rel="stylesheet" href="%s">', $style_sheet);

@@ -64,7 +64,18 @@
 
 <h1>Manage Respondents</h1>
 
-<?php // display error after checking flags
+<?php
+   // display message if redirected from delete_respondent.php
+   if (isset($_POST['deletion_status']) &&
+         isset($_POST['deletion_message'])) {
+      if ($_POST['deletion_status'] == "success") {
+         printf('<p class="success-message">%s</p>', $_POST['deletion_message']);
+      } else if ($_POST['deletion_status'] == "fail") {
+         printf('<p class="error-message">%s</p>', $_POST['deletion_message']);
+      }
+   }
+
+   // display error after checking flags
    if ($invalid_input) {
       print('<p class="error-message">Your input was invalid.</p>');
       print('<p class="error-message">Make sure <em>First Name</em> and
@@ -130,7 +141,7 @@
                print('<tr>');
                   printf('<td>%s %s</td>', $respondent['first_name'], $respondent['last_name']);
                   printf('<td>%s</td>', $respondent['email']);
-                  printf('<td><a href="remove_respondent.php?id=%d">Remove</a></td>',
+                  printf('<td><a href="delete_respondent.php?id=%d">Remove</a></td>',
                                  $respondent['respondent_id']);
                print('</tr>');
 
