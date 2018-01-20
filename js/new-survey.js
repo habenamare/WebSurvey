@@ -183,17 +183,35 @@
 
       /* Returns true if the Survey contains at least one Question
          with one Choice inside it, otherwise returns false.
+         NOTE: If there are more than one Questions then each Question
+               must have at least one Choice.
       */
       validateSurvey: function() {
+
+         var noOfQuestions = $('#questions').children('section').length;
+         var aQuestionWithNoChoice = false;
          // if there is at least one Question
-         if ($('#questions').children('section').length > 0) {
-            // if there is a Choice inside the first Question
-            if ($('#questions').children('section').first().find('div.choice').length > 0) {
+         if (noOfQuestions > 0) {
+            // for each Question check if there is at least one Choice
+            $('#questions').children('section').each(function() {
+               var choicesLength = $(this).find('div.choice').length;
+               console.log('test ' + choicesLength);
+               if (choicesLength == 0 ) {
+                  aQuestionWithNoChoice = true;
+               }
+            });
+
+            // if there is a Question with no Choice return false, otherwise
+            // return true;
+            if (aQuestionWithNoChoice) {
+               return false;
+            } else {
                return true;
             }
-         }
 
-         return false;
+         } else { // if there are no Questions
+            return false;
+         }
       },
 
       /* Returns true if the value inside '#newQuestionText textarea' is not empty,
@@ -250,7 +268,8 @@
          // return if there is not at least one Question containing
          // one Choice
          if (!Validators.validateSurvey()) {
-            alert('A survey must at least have one Question containing at least one choice.');
+            alert('A survey must at least have one Question containing at least ' +
+                     'one choice. NOTE: Every Question must contain at least one Choice.');
             return;
          }
          
