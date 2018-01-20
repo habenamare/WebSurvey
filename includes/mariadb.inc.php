@@ -119,8 +119,81 @@
          
       }
 
-      //
-      public static function add_survey() {
+      /* Survey is created as a transaction consisting of
+            - inserting in the Survey details in the Survey table
+            - inserting Survey's questions in the Question table
+               - inserting each Question's choices in the Choice table
+            - inserting Survey's respondents in the SurveyRespondent table
+         Returns true if Survey created successfully, returns NULL
+         otherwise.
+      */
+      public static function add_survey($name, $date_created, $expire_date,
+                           $questions, $respondents) {
+
+         try {
+
+            //=== start transaction
+            self::$conn->beginTransaction();
+
+            // create Survey
+            $survey_query = 'INSERT INTO Survey (name, date_created, expire_date)
+                             VALUES (?, ?, ?)';
+            $statement = self::$conn->prepare($survey_query);
+            $statement->execute([$name, $date_created, $expire_date]);
+            $created_survey_id = self::$conn->lastInsertID();
+            
+            // insert Questions with survey_id of the previously created Survey
+            foreach ($questions as $question) {
+               // insert Question to database
+               $question_query = 'INSERT INTO Question (question_number, question, choice_type,
+                                  survey_id) VALUES (?, ?, ?, ?)';
+               $statement = self::$conn->prepare($question_query);
+               $statement->execute([
+                  $question->questionNo,
+                  $question->question,
+                  $question->choiceType,
+                  $created_survey_id
+               ]);
+               $created_question_id = self::$conn->lastInsertID();
+
+               // insert Question's choices to database with question_id of
+               // the previously created Question
+               foreach($question->choices as $choice) {
+                  $choice_query = 'INSERT INTO Choice (choice, question_id)
+                                   VALUES (?, ?)';
+                  $statement = self::$conn->prepare($choice_query);
+                  $statement->execute([$choice, $created_question_id]);
+               }
+
+            }
+
+            // insert Respondents in SurveyRespondent
+            foreach ($respondents as $respondent_id) {
+               $survey_respondent_query = 'INSERT INTO SurveyRespondent (survey_id,
+                                 respondent_id, submission_code) VALUES (?, ?, ?);';
+               $statement = self::$conn->prepare($survey_respondent_query);
+               $statement->execute([$created_survey_id, $respondent_id, 987654]);
+            }
+            
+            // send emails
+            // if email sending is unsuccessful, rollback transaction
+            if (!Utils::send_emails(null)) {
+               throw new PDOException();
+            }
+
+            // Survey created successfully and E-mail sent successfully
+            //=== commit transaction
+            self::$conn->commit();
+            
+            return true;
+         } catch (PDOException $ex) {
+            // rollback transaction
+            self::$conn->rollback();
+
+            // Survey creation failed
+            return null;
+         }
+
 
       }
 
@@ -137,6 +210,7 @@
          Returns NULL if something goes wrong. 
       */
       public static function get_respondents() {
+      
          try {
             $statement = self::$conn->query('SELECT * FROM Respondent');
             $respondents = $statement->fetchAll();

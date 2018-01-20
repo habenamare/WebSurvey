@@ -48,7 +48,7 @@
    // check if the page wants DB access
    if (defined('DB_ACCESS')) {
       if (DB_ACCESS == true) {
-         require(__DIR__ . '/mariadb.inc.php');
+         require_once(__DIR__ . '/mariadb.inc.php');
       }
    }
 
