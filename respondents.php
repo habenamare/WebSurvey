@@ -141,7 +141,7 @@
                print('<tr>');
                   printf('<td>%s %s</td>', $respondent['first_name'], $respondent['last_name']);
                   printf('<td>%s</td>', $respondent['email']);
-                  printf('<td><a href="delete_respondent.php?id=%d">Remove</a></td>',
+                  printf('<td><a href="delete_respondent.php?id=%d">Delete</a></td>',
                                  $respondent['respondent_id']);
                print('</tr>');
 

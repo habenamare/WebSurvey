@@ -197,6 +197,31 @@
 
       }
 
+      /* Removes a Survey in the database given $survey_id.
+         Returns TRUE if the Survey was removed.
+         Returns NULL if trying to remove the Survey was unsuccessful.
+      */
+      public static function remove_survey($survey_id) {
+            $query = 'DELETE FROM Survey WHERE survey_id=?';
+   
+            try {
+               $statement = self::$conn->prepare($query);
+               // execute query using the given $survey_id and get rows
+               // affected by query
+               $statement->execute([$survey_id]);
+               $rows_affected = $statement->rowCount();
+               
+               if ($rows_affected == 1) {
+                  return true;
+               } else {
+                  return NULL;
+               }
+            } catch (PDOException $ex) {
+               return NULL;
+            }
+   
+         }
+
 
       // --------------------------------------------------
       // Respondent
@@ -245,7 +270,7 @@
       }
 
       /* Removes a Respondent in the database given $respondent_id. 
-         Returns TRUE if the Respondent is removed.
+         Returns TRUE if the Respondent was removed.
          Returns NULL if trying to remove the Respondent was unsuccessful.
       */
       public static function remove_respondent($respondent_id) {
@@ -254,7 +279,7 @@
          try {
             $statement = self::$conn->prepare($query);
             // execute query using the given $respondent_id and get rows
-            //affected by query
+            // affected by query
             $statement->execute([$respondent_id]);
             $rows_affected = $statement->rowCount();
             

@@ -30,6 +30,17 @@
 
 <h1>Surveys</h1>
 
+<?php // display message if redirected from delete_survey.php
+   if (isset($_POST['deletion_status']) &&
+      isset($_POST['deletion_message'])) {
+      if ($_POST['deletion_status'] == "success") {
+         printf('<p class="success-message">%s</p>', $_POST['deletion_message']);
+      } else if ($_POST['deletion_status'] == "fail") {
+         printf('<p class="error-message">%s</p>', $_POST['deletion_message']);
+      }
+   }
+?>
+
 <a href="new_survey.php" title="create new survey">create new</a>
 
 <?php

@@ -27,3 +27,11 @@ main h1 {
    padding: 10px;
    font-size: 1.3em;
 }
+
+.error-message {
+   color: red;
+}
+
+.success-message {
+   color: green;
+}
