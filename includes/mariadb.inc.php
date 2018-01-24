@@ -128,7 +128,7 @@
          otherwise.
       */
       public static function add_survey($name, $date_created, $expire_date,
-                           $questions, $respondents) {
+                           $questions, $respondent_ids) {
 
          try {
 
@@ -167,26 +167,48 @@
 
             }
 
-            // insert Respondents in SurveyRespondent
-            foreach ($respondents as $respondent_id) {
+            //=== insert Respondents in SurveyRespondent
+            /*-- populate $respondent_ids_with_codes with
+                 respondent_id as KEY and submission_code as VALUE */ 
+            $respondent_ids_with_codes = [];
+            //-- get unique random strings for each Respondent
+            $respondents_length = count($respondent_ids);
+            $randoms = Utils::create_randoms($respondents_length);
+            /*-- insert each Respondent with unique random string into
+                 SurveyRespondent                                     */
+            for ($i = 0; $i < $respondents_length; $i++) {
                $survey_respondent_query = 'INSERT INTO SurveyRespondent (survey_id,
-                                 respondent_id, submission_code) VALUES (?, ?, ?);';
+                     respondent_id, submission_code) VALUES (?, ?, ?);';
                $statement = self::$conn->prepare($survey_respondent_query);
-               $statement->execute([$created_survey_id, $respondent_id, 987654]);
-            }
-            
-            // send emails
-            // if email sending is unsuccessful, rollback transaction
-            if (!Utils::send_emails(null)) {
-               throw new PDOException();
-            }
+               
+               $statement->execute([
+                  $created_survey_id,
+                  $respondent_ids[$i],
+                  $randoms[$i] 
+               ]);
 
-            // Survey created successfully and E-mail sent successfully
+               // populate $respondent_ids_with_codes
+               $r_id = $respondent_ids[$i];
+               $respondent_ids_with_codes[$r_id] = $randoms[$i];
+
+            }
+            //===
+            
+            //=== send e-mails
+            // if email sending is unsuccessful, rollback transaction
+            $sending_success = Utils::send_emails($respondent_ids_with_codes, $name);
+            if (!$sending_success) {
+               // e-mails sending failed
+               //throw new Exception();
+            }
+            //===
+
+            // Survey created successfully and e-mails sent successfully
             //=== commit transaction
             self::$conn->commit();
             
             return true;
-         } catch (PDOException $ex) {
+         } catch (Exception $ex) {
             // rollback transaction
             self::$conn->rollback();
 
