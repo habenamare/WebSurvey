@@ -135,14 +135,15 @@
             //=== start transaction
             self::$conn->beginTransaction();
 
-            // create Survey
+            //=== create Survey on the database
             $survey_query = 'INSERT INTO Survey (name, date_created, expire_date)
                              VALUES (?, ?, ?)';
             $statement = self::$conn->prepare($survey_query);
             $statement->execute([$name, $date_created, $expire_date]);
             $created_survey_id = self::$conn->lastInsertID();
-            
-            // insert Questions with survey_id of the previously created Survey
+            //===
+
+            //=== insert Questions with survey_id of the previously created Survey
             foreach ($questions as $question) {
                // insert Question to database
                $question_query = 'INSERT INTO Question (question_number, question, choice_type,
@@ -166,8 +167,9 @@
                }
 
             }
+            //===
 
-            //=== insert Respondents in SurveyRespondent
+            //=== insert Respondents in SurveyRespondent while generating submission codes
             /*-- populate $respondent_ids_with_codes with
                  respondent_id as KEY and submission_code as VALUE */ 
             $respondent_ids_with_codes = [];
@@ -199,7 +201,7 @@
             $sending_success = Utils::send_emails($respondent_ids_with_codes, $name);
             if (!$sending_success) {
                // e-mails sending failed
-               //throw new Exception();
+               throw new Exception();
             }
             //===
 

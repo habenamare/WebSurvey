@@ -4,7 +4,20 @@
       that can be reused by any part of the application.
    */
 
+   // require 'PHPMailer' library for sending e-mails
+   use PHPMailer\PHPMailer\PHPMailer;
+   use PHPMailer\PHPMailer\Exception;
+   
+   require_once(__DIR__ . '/../libs/PHPMailer-6.0.3/src/Exception.php');
+   require_once(__DIR__ . '/../libs/PHPMailer-6.0.3/src/PHPMailer.php');
+   require_once(__DIR__ . '/../libs/PHPMailer-6.0.3/src/SMTP.php');
+
+   // for DB access
    require_once(__DIR__ . '/mariadb.inc.php');
+
+   // get constants SENDING_EMAIL_ADDRESS and SENDING_EMAIL_PASSWORD which
+   // are used as username and password respectively, when sending e-mails
+   require(__DIR__ . '/../../../WebSurveyNotServed/email.config.php');
 
    class Utils {
 
@@ -22,6 +35,7 @@
 
       //===================================================================
       //=== functions to create unique 9-digit random strings
+
       // Returns a 9-digit random string
       private static function generate_random() {
          $random_string = "";
@@ -103,11 +117,76 @@
       }
       //===================================================================
 
-      /* a function to send e-mails to respondents
-         @param $respondent_ids_with_codes, an array containing respondents id
-                as KEY and unique submission code as VALUE.
-         @param $survey_name, name of the Survey Respondents will be participating
-         Returns true if e-mails were sent successfully.
+      //===================================================================
+      //=== functions to send e-mails to Respondents
+
+      /* a function to send a single e-mail
+         @param $respondent, array representing a single Respondent from the database
+         @param $survey_name, name of the Survey the Respondent can participate in
+         @param $submission_code, submission code needed to participate on the Survey
+         Returns true if email was sent successfully, returns false otherwise.
+      */
+      public static function send_email($respondent, $survey_name, $submission_code) {
+         // configure settings to send e-mail
+         $mail = new PHPMailer(true);
+         
+         try {
+         
+            // enable SMTP debugging
+            //$mail->SMTPDebug = 3;                               
+            
+            // set PHPMailer to use SMTP
+            $mail->isSMTP();
+         
+            // set SMTP host name                          
+            $mail->Host = 'smtp.gmail.com';
+         
+            // set SMTPAuth to true if SMTP host requires authentication to send email
+            $mail->SMTPAuth = true;   
+         
+            // provide username and password     
+            $mail->Username = SENDING_EMAIL_ADDRESS;                 
+            $mail->Password = SENDING_EMAIL_PASSWORD;                           
+            
+            // if SMTP requires TLS encryption then set it
+            $mail->SMTPSecure = "tls";                           
+         
+            // set TCP port to connect to 
+            $mail->Port = 587;                                   
+         
+            $mail->From = SENDING_EMAIL_ADDRESS;
+            $mail->FromName = "Web Survey";
+
+            $respondent_name = $respondent['first_name'] . $respondent['last_name'];
+            $mail->addAddress($respondent['email'], $respondent_name);
+         
+            $mail->isHTML(true);
+         
+            $mail->Subject = 'Participate on ' . $survey_name  . '.';
+            $mail->Body    = 'Dear <i>' . $respondent_name .
+                             '</i>, Please participate in <b>' .
+                             $survey_name . '</b> survey using the following code. <i>' .
+                             $submission_code . '</i>';
+
+            $mail->AltBody = "plain text version of e-mail";
+         
+            $mail->send();
+
+            // message sent successfully
+            return true;
+         } catch (Exception $ex) {
+            // message could not be sent
+            return false;
+         }
+
+      }
+
+      /* a function to send e-mails to Respondents
+         @param $respondent_ids_with_codes, an array containing respondents ids
+                as KEY and unique submission codes as VALUE.
+         @param $survey_name, name of the Survey the Respondents will be participating
+         Returns true if e-mails were sent successfully, returns false if something
+         goes wrong.
       */
       public static function send_emails($respondent_ids_with_codes, $survey_name) {
          $respondent_ids = array_keys($respondent_ids_with_codes);
@@ -124,19 +203,19 @@
          // send mail for each Respondent's e-mail
          foreach ($email_respondents as $r) {
             $r_id = $r['respondent_id'];
-            $new_mail = 'Dear ' . $r['first_name'] . ' ' . $r['last_name'] .
-                        ', Please participate in ' .
-                        $survey_name . ' survey using the following code. ' .
-                        $respondent_ids_with_codes[$r_id];
-
-            $accepted_for_delivery = mail($r['email'], 'Participate in Survey', $new_mail);
-            // If sending e-mail to one of the Respondents fails, then return false.
-            if (!$accepted_for_delivery) {
+            $submission_code = $respondent_ids_with_codes[$r_id];
+            $sent = self::send_email($r, $survey_name, $submission_code);
+            // if an e-mail could not be sent
+            if (!$sent) {
                return false;
             }
-         }
 
+         }
+         
+         // if all e-mail were sent successfully
          return true;
       }
+      //===================================================================
+
 
    }
