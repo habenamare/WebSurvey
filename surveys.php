@@ -64,7 +64,7 @@
             printf('<h2>%s</h2>', $survey['name']);
 
             print('<div class="survey-operations">');
-            printf('<a href="view_result.php?id=%d" title="view result">View Result</a>',
+            printf('<a href="view_responses.php?id=%d" title="view responses">View Responses</a>',
                      $survey['survey_id']);
             printf('<a href="delete_survey.php?id=%d" title="delete this survey">Delete Survey</a>', $survey['survey_id']);
             print('</div>');

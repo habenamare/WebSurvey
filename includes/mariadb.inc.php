@@ -119,6 +119,25 @@
          
       }
 
+      /* Returns an array containing a Survey with the given $survey_id.
+         Returns false or NULL if a $survey with that id doesn't exist or
+         something goes wrong when fetching a Survey.
+      */
+      public static function get_survey($survey_id) {
+         $query = 'SELECT * FROM Survey WHERE survey_id=?';
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $survey_id
+            $statement->execute([$survey_id]);
+            
+            $survey = $statement->fetch();
+            
+            return $survey;
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+      }
+
       /* Survey is created as a transaction consisting of
             - inserting in the Survey details in the Survey table
             - inserting Survey's questions in the Question table
@@ -244,7 +263,81 @@
                return NULL;
             }
    
+      }
+
+
+      // --------------------------------------------------
+      // Question
+      // --------------------------------------------------
+
+      /* Returns an array of Questions that belong to the Survey of the
+         given $survey_id.
+         Returns false or NULL if something goes wrong.
+      */
+      public static function get_questions($survey_id) {
+         $query = 'SELECT * FROM Question WHERE survey_id=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            $statement->execute([$survey_id]);
+            
+            $questions = $statement->fetchAll();
+
+            // We don't check if $quesitons is EMPTY because it is known
+            // that a Survey contains at least one Question.
+            return $questions;
+
+         } catch (PDOException $ex) {
+            return NULL;
          }
+      }
+
+      /* Returns the total number of times chosen of the Choices that
+         belong to the Question of the given $question_id.
+         Returns NULL if something goes wrong.
+      */
+      public static function get_total_numberOfTimesChosen($question_id) {
+         $total_numberOfTimesChosen = 0;
+
+         $choices = self::get_choices($question_id);
+
+         if (!$choices) {
+            return NULL;
+         }
+
+         foreach ($choices as $choice) {
+            $total_numberOfTimesChosen += $choice['no_of_times_chosen'];
+         }
+
+         return $total_numberOfTimesChosen;
+      }
+
+
+      // --------------------------------------------------
+      // Choice
+      // --------------------------------------------------
+
+      /* Returns an array of Choices that belong to the Question of the
+         given $question_id.
+         Returns false or NULL if something goes wrong.
+      */
+      public static function get_choices($question_id) {
+         $query = 'SELECT * FROM Choice WHERE question_id=?';
+         
+         try {
+            $statement = self::$conn->prepare($query);
+            $statement->execute([$question_id]);
+            
+            $choices = $statement->fetchAll();
+
+            // We don't check if $choices is EMPTY because it is known
+            // that a Question contains at least one Choice.
+            return $choices;
+
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+      }
 
 
       // --------------------------------------------------
