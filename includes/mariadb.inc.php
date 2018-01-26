@@ -224,10 +224,10 @@
             }
             //===
 
-            // Survey created successfully and e-mails sent successfully
             //=== commit transaction
             self::$conn->commit();
-            
+
+            // Survey created successfully and e-mails sent successfully
             return true;
          } catch (Exception $ex) {
             // rollback transaction
@@ -236,7 +236,6 @@
             // Survey creation failed
             return null;
          }
-
 
       }
 
@@ -339,6 +338,33 @@
          }
       }
 
+      /* Returns true if the Choice with the given $choice_id had
+         its no_of_times_chosen column incremented successfully.
+         Returns NULL if trying to increment no_of_times_chosen column
+         failed.
+      */
+      private static function increment_no_of_times_chosen($choice_id) {
+         $query = 'UPDATE Choice SET no_of_times_chosen = no_of_times_chosen + 1
+                   WHERE choice_id=?';
+         
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $choice_id and get rows
+            // affected by query
+            $statement->execute([$choice_id]);
+            $rows_affected = $statement->rowCount();
+            
+            if ($rows_affected == 1) {
+               return true;
+            } else {
+               return NULL;
+            }
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
+
 
       // --------------------------------------------------
       // Respondent
@@ -409,6 +435,162 @@
             return NULL;
          }
 
+      }
+
+      
+      // --------------------------------------------------
+      // Reflect a Response in the database
+      // --------------------------------------------------
+
+      /* Returns true if the submission code ($submission_code) exists for the
+         Survey $survey_id, Returns false otherwise.
+         Returns NULL if something goes wrong when checking.
+      */
+      private static function submission_code_exists($submission_code, $survey_id) {
+         $query = 'SELECT 1 FROM SurveyRespondent
+                   WHERE survey_id=?
+                   AND submission_code=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            $statement->execute([ $survey_id, $submission_code ]);
+
+            // If the given submission code with the given survey_id exists 1
+            // will be selected, therefore 1 (true) will be returned.
+            // Otherwise false will be returned.
+            return $statement->fetchColumn();
+            
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+         
+      }
+
+      /* Returns true if the given submission code for the Survey with the
+         given survey_id has already been used. Returns false otherwise.
+         Returns NULL if something goes wrong when checking.
+         NOTE: 'self::submission_code_exists' function can be used to check if
+               the submission code and survey id combination really exist.
+      */
+      private static function submission_code_is_used($submission_code, $survey_id) {
+         $query = 'SELECT submission_code_used FROM SurveyRespondent
+                   WHERE survey_id=?
+                   AND submission_code=?';
+
+         try {
+         $statement = self::$conn->prepare($query);
+         $statement->execute([ $survey_id, $submission_code ]);
+         $already_used =  $statement->fetchColumn();
+
+         if ($already_used == 1) {
+            return true;
+         } else if ($already_used == 0) {
+            return false;
+         }
+
+         
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
+
+      /* Returns true if the given submission code's 'submission_code_used'
+         column value is updated to 1 successfully.
+         Returns NULL otherwise.
+      */
+      private static function make_submission_code_used($submission_code, $survey_id) {
+         $query = 'UPDATE SurveyRespondent SET submission_code_used=1
+                   WHERE survey_id=? AND submission_code=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $survey_id and $submission_code
+            // and get rows affected by query
+            $statement->execute([ $survey_id, $submission_code ]);
+            $rows_affected = $statement->rowCount();
+            
+            if ($rows_affected == 1) {
+               return true;
+            } else {
+               return NULL;
+            }
+            
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
+
+      /* Returns true if a response was successfully reflected in the database.
+            - $submission_code and $survey_id combination exist in the database
+            - $submission_code has not been used to submit a Survey with $survey_id
+            - Every chosen Choice's no_of_times_chosen is incremented successfully
+              in the database
+            - $submission_code's 'submission_code_used' value is set to 1 in the
+              database
+         Returns false or NULL otherwise.
+      */
+      public static function add_response($survey_id, $submission_code, $choice_ids) {
+
+         // check if the $submission_code and $survey_id pair exist in the database
+         $combination_exists = Database::submission_code_exists($submission_code, $survey_id);
+         if (!$combination_exists) {
+            return false;
+         }
+
+         // check if the $submission_code has already been used
+         $submission_code_already_used = Database::submission_code_is_used(
+                                    $submission_code, $survey_id);
+         if ($submission_code_already_used) {
+            return false;
+         }
+
+         // if submission code and survey id combination exists AND
+         // has not been used yet
+         try {
+            //=== start transaction
+            self::$conn->beginTransaction();
+
+            //=== increment no_of_times_chosen of each Choice with choice_id
+            //    belonging in the $choice_ids array
+            foreach ($choice_ids as $choice_id) {
+               $incremented_successfully = self::increment_no_of_times_chosen($choice_id);
+               
+               // if incrementing on any of the Choices fails, abort (rollback) transaction
+               if (!$incremented_successfully) {
+                  throw new Exception();
+               }
+            }
+            //===
+
+
+            //=== set the submission code's 'submission_code_used' to 1
+            $submission_code_used_changed = self::make_submission_code_used(
+                                       $submission_code, $survey_id);
+
+            // if trying to change submission code's 'submission_code_used'
+            // fails, abort (rollback) transaction
+            if (!$submission_code_used_changed) {
+               throw new Exception();
+            }
+            //===
+
+            //=== commit transaction
+            self::$conn->commit();
+            
+            // All Choice's 'no_of_times_chosen' incremented in the database
+            // successfully AND the submission code's 'submission_code_used' set
+            // to 1 in the database successfully
+            return true;
+
+         } catch (Exception $ex) {
+            // rollback transaction
+            self::$conn->rollback();
+            
+            return null;
+         }
+         
       }
 
    }

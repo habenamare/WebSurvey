@@ -24,8 +24,8 @@
          return today.getFullYear() + '-' + month + '-' + day;
       },
 
-      /* Returns the digits from the first occurence of a numeric
-         character in a String as a Number
+      /* Returns the characters from the first occurence of a numeric
+         character in a String upto the end of the string as a Number.
          eg. 'question1'       will retrun 1
              'choice1'         will return 1
              'choiceForQNo234' will return 234
@@ -243,7 +243,7 @@
             make sure that Survey name is valid input
             make sure there is at least one Question with One Choice
             make sure there is at least one Respondent selected
-            create Survey JSON
+            create and send Survey JSON
 
       */
       createSurveyButtonClicked: function(event) {
@@ -275,7 +275,7 @@
          
          // send generated Survey JSON string through ajax,
          // the server will then return 'success' or 'fail' depending
-         // of how the survey creation went on the server side
+         // on how the survey creation went on the server side
          $.ajax({
             url: 'new_survey.php',
             data: {
