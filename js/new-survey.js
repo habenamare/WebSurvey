@@ -61,7 +61,7 @@
                         "choice2",
                         "choice3"
                      ],
-                     "choiceType": "s"
+                     "questionType": "s"
                   },
                   {
                      "questionText": "This is the second question.",
@@ -71,7 +71,7 @@
                         "choice2",
                         "choice3"
                      ],
-                     "choiceType": "m"
+                     "questionType": "m"
                   }
                ],
                "respondentsId": [
@@ -122,7 +122,7 @@
                "question": questionText,
                "questionNo": questionNoCount,
                "choices": choicesArray,
-               "choiceType": Helpers.getQuestionTypeOf(
+               "questionType": Helpers.getQuestionTypeOf(
                                        Helpers.noFromElementId($(this).attr('id'))
                                                       )
             });

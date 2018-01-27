@@ -115,7 +115,7 @@
    foreach ($questions as $question) {
 
       printf('<section id="question%d" class="question" data-question-type="%s">',
-                     $question['question_id'], $question['choice_type']);
+                     $question['question_id'], $question['question_type']);
 
       // display <question_no>. <question text>
       printf('<h2>%d. %s</h2>', $question['question_number'],
@@ -134,10 +134,10 @@
 
          // display Choice as input[type="radio"] for Single Select Question
          //                or input[type="checkbox"] for Multiple Select Question
-         if ($question['choice_type'] == 's') {
+         if ($question['question_type'] == 's') {
             printf('<input type="radio" name="question%d" id="choice%d">',
                   $question['question_id'], $choice['choice_id']);
-         } else if ($question['choice_type'] == 'm') {
+         } else if ($question['question_type'] == 'm') {
             printf('<input type="checkbox" name="question%d" id="choice%d">',
                   $question['question_id'], $choice['choice_id']);        
          }

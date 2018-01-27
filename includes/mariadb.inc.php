@@ -165,13 +165,13 @@
             //=== insert Questions with survey_id of the previously created Survey
             foreach ($questions as $question) {
                // insert Question to database
-               $question_query = 'INSERT INTO Question (question_number, question, choice_type,
+               $question_query = 'INSERT INTO Question (question_number, question, question_type,
                                   survey_id) VALUES (?, ?, ?, ?)';
                $statement = self::$conn->prepare($question_query);
                $statement->execute([
                   $question->questionNo,
                   $question->question,
-                  $question->choiceType,
+                  $question->questionType,
                   $created_survey_id
                ]);
                $created_question_id = self::$conn->lastInsertID();
