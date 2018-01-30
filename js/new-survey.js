@@ -4,8 +4,61 @@
    var questionCount = 1;
    var choiceCount = 1;
 
+   var Colors = {
+      'GREEN'      : '#87a96b',
+      'RED'        : '#e44d2e',
+      'BORDER_GRAY': '#dbdbdb', // Gray86
+      'SHADOW_GRAY': '#e8e8e8', // Gray91
+      'WHITE'      : '#ffffff'
+   };
+
    // helper modules
    var Helpers = {
+
+      // displays a popup to notify the user using jquery-ui's 'Dialog'
+      notify: function(message) {
+         // insert 'message' into popup placeholder
+         $('#notificationMessage').html(
+            '<p>' + message + '</p>'
+         );
+
+         // display popup as modal
+         $('#notificationMessage').dialog({
+            modal: true,
+            buttons: {
+               Ok: function() {
+                  $(this).dialog("close");
+               }
+            }
+         });
+         
+      },
+
+      // notify by animating border color
+      notifyByBorderColor: function(elementId, fromColor, toColor) {
+         var queryId = '#' + elementId;
+         $(queryId).animate({
+            borderWidth: '4px',
+            borderStyle: 'solid',
+            borderColor: fromColor
+         }, 400);
+         $('#' + elementId ).animate({
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: toColor
+         }, 400);
+      },
+
+      // notify by animating background color
+      notifyByBackgroundColor: function(elementId, fromColor, toColor) {
+         var queryId = '#' + elementId;
+         $(queryId).animate({
+            backgroundColor: fromColor
+         }, 400);
+         $('#' + elementId ).animate({
+            backgroundColor: toColor,
+         }, 400);
+      },
 
       // Returns current date in ISO format
       getToday: function() {
@@ -249,26 +302,26 @@
       createSurveyButtonClicked: function(event) {
          // return if Survey Name is invalid input
          if (!Validators.validateSurveyName()) {
-            alert('#surveyName can not be empty');
+            Helpers.notify('Survey name can not be empty. Please Try Again.');
             return;
          }
 
          // return if Expire Date is invalid input
          if (!Validators.validateExpireDateInput()) {
-            alert('Incorrect expire date inputed.');
+            Helpers.notify('Incorrect Expire Date format. FORMAT: yyyy-mm-dd, eg. 2018-01-31.');
             return;
          }
 
          // return if there is no Respondent checked
          if (!Validators.validateSurveyRespondents()) {
-            alert('A survey must have at least one respondent.');
+            Helpers.notify('A survey must have at least one respondent. Choose a Respondent and please try again.');
             return;
          }
          
          // return if there is not at least one Question containing
          // one Choice
          if (!Validators.validateSurvey()) {
-            alert('A survey must at least have one Question containing at least ' +
+            Helpers.notify('A survey must at least have one Question containing at least ' +
                      'one choice. NOTE: Every Question must contain at least one Choice.');
             return;
          }
@@ -316,7 +369,9 @@
       addQuestionButtonClicked: function(event) {
          // return if #newQuestionText is not valid input
          if (!Validators.validatenewQuestionText()) {
-            alert('#newQuestionText cannot be empty');
+            Helpers.notify('You cannot create an empty Question. \
+                            Please try again by entering the Question \
+                            in the space provided.');
             return;
          }
 
@@ -367,6 +422,9 @@
          
          // increment questionCount
          questionCount++;
+
+         // notify that the question was added
+         Helpers.notifyByBorderColor("questions", Colors.GREEN, Colors.BORDER_GRAY);
       },
 
       /* event handler when any of the 'Add Choice' buttons is clicked
@@ -392,7 +450,9 @@
 
          // return if #choiceInputFor<questionIdOfNewChoice> is not valid input
          if (!Validators.validateChoiceInput(choiceInputText)) {
-            alert('#choiceInputFor' + questionId + ' can not be empty');
+            Helpers.notify('You cannot create an empty Choice. \
+                            Please tr again by entering the Choice \
+                            in the space provided.');
             return;
          }
 
@@ -432,6 +492,10 @@
 
          // increment choiceCount
          choiceCount++;
+
+         // notify that the choice was added         
+         Helpers.notifyByBackgroundColor("question" + questionId,
+                                 Colors.BORDER_GRAY, Colors.WHITE);
       },
 
       // event handler when any of the 'Remove Question' buttons is clicked
@@ -444,7 +508,7 @@
          $('#question' + questionToBeRemovedId).remove();
 
          // notify that the question was removed
-         alert('Question Removed');
+         Helpers.notifyByBorderColor("questions", Colors.RED, Colors.BORDER_GRAY);
       },
 
       // event handler when any of the 'remove' buttons (for choices) is clicked
@@ -453,11 +517,17 @@
          // 'remove' button id
          var choiceToBeRemovedId = Helpers.noFromElementId(event.target.id);
 
+         // for notification purposes
+         var choiceDivParentId = $('#choiceDiv'+choiceToBeRemovedId).parent().attr("id");
+         var choiceRemovalQuestionId = Helpers.noFromElementId(choiceDivParentId);
+
+
          // remove #choiceDiv<choiceToBeRemoved> from the DOM
          $('#choiceDiv' + choiceToBeRemovedId).remove();
 
-         // notify that the choice was remoed
-         alert('Choice Removed');
+         // notify that the choice was removed
+         Helpers.notifyByBackgroundColor("question" + choiceRemovalQuestionId,
+                              Colors.RED, Colors.WHITE);
       }
 
    };

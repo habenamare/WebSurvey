@@ -44,17 +44,23 @@
       
    ];
    const STYLESHEETS = [
-      'css/new-survey.css'
+      'css/new-survey.css',
+      'libs/jquery-ui-1.12.1/jquery-ui.css'
    ];
 
    // constant for 'footer.php'
    const SCRIPTS = [
-      'js/jquery-3.2.1.min.js',
+      'libs/jquery-3.2.1/jquery.min.js',
+      'libs/jquery-ui-1.12.1/jquery-ui.js',
       'js/new-survey.js'
    ];
    
    require('includes/header.php');
 ?>
+
+<!-- div for notification message -->
+<div style="display: none;" id="notificationMessage" title="Warning">
+</div>
 
 <h1>Create New Survey</h1>
 
@@ -66,9 +72,9 @@
 
 <label for="surveyName">Survey Name</label>
 <input type="text" id="surveyName">
-
+<br>
 <label for="expireDate">Expire Date</label>
-<input type="text" id="expireDate" value="2018-01-25">
+<input type="date" id="expireDate" value="2018-01-25">
 <br>
 
 <section id="respondents">
@@ -80,7 +86,7 @@
                      $respondent['first_name'], $respondent['last_name']);
          printf('<br>');
       }
-?>
+   ?>
 </section>
 
 <section id="createNewQuestion">
@@ -88,7 +94,7 @@
    <p><b>NOTE:</b> Questions will be numbered starting from 1 in the
    order they are created.</p>
 
-   <textarea id="newQuestionText" cols="80" rows="3"></textarea>
+   <textarea id="newQuestionText" cols="140" rows="3"></textarea>
    
    <br>
 

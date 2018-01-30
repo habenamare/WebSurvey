@@ -1,0 +1,35 @@
+#questions, #createNewQuestion, #respondents {
+   border: 1px solid #dbdbdb;
+   color: #222;
+   padding: 0px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-bottom: 15px;
+   margin-bottom: 15px;
+   box-shadow: 0 2px 5px #e8e8e8;
+}
+
+textarea {
+   resize: none;
+}
+
+#questions {
+   display: grid;
+   grid-template-columns: 1fr 1fr 8fr 3fr;
+}
+   #questions h2 {
+      grid-column: 1/5;
+   }
+
+   #questions .question {
+      grid-column: 1/5;
+      padding: 10px;
+   }
+
+   .question .choice p {
+      grid-column: 1;
+   }
+
+   .question .choice button {
+      grid-column: 2;
+   }
