@@ -22,11 +22,24 @@
    ];
 
    const STYLESHEETS = [
+      'libs/jquery-ui-1.12.1/jquery-ui.css',      
       'css/surveys.css'
+   ];
+
+   const SCRIPTS = [
+      'libs/jquery-3.2.1/jquery.min.js',
+      'libs/jquery-ui-1.12.1/jquery-ui.js',
+      'js/surveys.js'
    ];
    
    require('includes/header.php');
 ?>
+
+<!-- div for confirmation message -->
+<div style="display: none;" id="deletion-confirmation" title="DELETING Survey">
+  <p>The Survey and everything associated with the Survey will be
+     permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
 
 <h1>Surveys</h1>
 
@@ -60,13 +73,14 @@
       } else { // Surveys retrieved from the database
 
          foreach ($surveys as $survey) {
-            print('<section class="survey">');
+            printf('<section id="survey%d" class="survey">', $survey['survey_id']);
             printf('<h2>%s</h2>', $survey['name']);
 
             print('<div class="survey-operations">');
             printf('<a href="view_responses.php?id=%d" title="view responses">View Responses</a>',
                      $survey['survey_id']);
-            printf('<a href="delete_survey.php?id=%d" title="delete this survey">Delete Survey</a>', $survey['survey_id']);
+            printf('<a href="delete_survey.php?id=%d" title="delete this survey"
+                    class="delete-survey-button">Delete Survey</a>', $survey['survey_id']);
             print('</div>');
 
             print('</section>');
