@@ -207,7 +207,7 @@
          empty, returns false otherwise.
        */
       validateSurveyName: function() {
-         if ($('#surveyName').val().length == 0) {
+         if ($('#surveyName').val().trim().length == 0) {
             return false;
          } else {
             return true;
@@ -271,7 +271,7 @@
          returns false otherwise.
       */
       validatenewQuestionText: function() {
-         if ($('#newQuestionText').val().length == 0) {
+         if ($('#newQuestionText').val().trim().length == 0) {
             return false;
          } else {
             return true;
@@ -280,7 +280,7 @@
 
       // Returns true if 'choiceText' is not empty, returns false otherwise.
       validateChoiceInput: function(choiceText) {
-         if(choiceText.length == 0) {
+         if(choiceText.trim().length == 0) {
             return false;
          } else {
             return true;

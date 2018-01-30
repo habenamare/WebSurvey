@@ -74,7 +74,7 @@
 <input type="text" id="surveyName">
 <br>
 <label for="expireDate">Expire Date</label>
-<input type="date" id="expireDate" value="2018-01-25">
+<input type="date" id="expireDate" value="<?php print(date('Y-m-d')); ?>">
 <br>
 
 <section id="respondents">
