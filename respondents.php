@@ -22,7 +22,14 @@
    ];
 
    const STYLESHEETS = [
+      'libs/jquery-ui-1.12.1/jquery-ui.css',
       'css/respondents.css'
+   ];
+
+   const SCRIPTS = [
+      'libs/jquery-3.2.1/jquery.min.js',
+      'libs/jquery-ui-1.12.1/jquery-ui.js',
+      'js/respondents.js'
    ];
    
    require('includes/header.php');
@@ -61,6 +68,11 @@
    
    }
 ?>
+
+<!-- div for confirmation message -->
+<div style="display: none;" id="deletion-confirmation" title="DELETING Respondent">
+  <p>Deleting a respondent can't be undone. Are you sure you want to continue?</p>
+</div>
 
 <h1>Manage Respondents</h1>
 
@@ -141,7 +153,8 @@
                print('<tr>');
                   printf('<td>%s %s</td>', $respondent['first_name'], $respondent['last_name']);
                   printf('<td>%s</td>', $respondent['email']);
-                  printf('<td><a href="delete_respondent.php?id=%d">Delete</a></td>',
+                  printf('<td><a href="delete_respondent.php?id=%d"' .
+                         ' class="delete-respondent-button">Delete</a></td>',
                                  $respondent['respondent_id']);
                print('</tr>');
 
