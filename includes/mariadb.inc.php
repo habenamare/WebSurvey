@@ -217,7 +217,7 @@
             
             //=== send e-mails
             // if email sending is unsuccessful, rollback transaction
-            $sending_success = Utils::send_emails($respondent_ids_with_codes, $name);
+            $sending_success = Utils::send_emails($respondent_ids_with_codes, $name, $created_survey_id);
             if (!$sending_success) {
                // e-mails sending failed
                throw new Exception();

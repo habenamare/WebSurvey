@@ -126,7 +126,8 @@
          @param $submission_code, submission code needed to participate on the Survey
          Returns true if email was sent successfully, returns false otherwise.
       */
-      public static function send_email($respondent, $survey_name, $submission_code) {
+      public static function send_email($respondent, $survey_name, $survey_id,
+                                                            $submission_code) {
          // configure settings to send e-mail
          $mail = new PHPMailer(true);
          
@@ -162,13 +163,30 @@
          
             $mail->isHTML(true);
          
-            $mail->Subject = 'Participate on ' . $survey_name  . '.';
-            $mail->Body    = 'Dear <i>' . $respondent_name .
-                             '</i>, Please participate in <b>' .
-                             $survey_name . '</b> survey using the following code. <i>' .
-                             $submission_code . '</i>';
+            // message body in HTML
+            $message_body = 
+               '<div style="font-family: sans-serif; text-align: center;">' .
+               '<h1 style="background: #dbdbdb;">' .
+                  $survey_name .
+               '</h1>'.
+               '<p>We would really appreciate it if you take five minute of your' .
+               '   time to complete this Survey.</p>' .
+               '<p>Please ' .
+               '<a href="localhost/WebSurvey/take_survey.php?id=' .
+                  $survey_id .
+               '" title="click here to take the survey"' .
+               '  target="_blank">CLICK HERE</a> to go to the survey.</p>' .
+               '<p>You need the submission code ' .
+               '<strong>' . $submission_code .
+               '</strong> to successfully submit your answers.</p>' .
+                '</div>';
+            
+            // message in plain text form
+            $message_plain_text = 'Currently, there is no plain text version of this email.';
 
-            $mail->AltBody = "plain text version of e-mail";
+            $mail->Subject = 'Participate on ' . $survey_name  . '.';
+            $mail->Body = $message_body;
+            $mail->AltBody = $message_plain_text;
          
             $mail->send();
 
@@ -188,7 +206,8 @@
          Returns true if e-mails were sent successfully, returns false if something
          goes wrong.
       */
-      public static function send_emails($respondent_ids_with_codes, $survey_name) {
+      public static function send_emails($respondent_ids_with_codes, $survey_name,
+                                                               $survey_id) {
          $respondent_ids = array_keys($respondent_ids_with_codes);
          $email_respondents = [];
          
@@ -204,7 +223,7 @@
          foreach ($email_respondents as $r) {
             $r_id = $r['respondent_id'];
             $submission_code = $respondent_ids_with_codes[$r_id];
-            $sent = self::send_email($r, $survey_name, $submission_code);
+            $sent = self::send_email($r, $survey_name, $survey_id, $submission_code);
             // if an e-mail could not be sent
             if (!$sent) {
                return false;
