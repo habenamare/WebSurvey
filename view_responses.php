@@ -20,6 +20,12 @@
    const STYLESHEETS = [
       'css/view-responses.css'
    ];
+
+   const SCRIPTS = [
+      'libs/chartjs-2.7.1/Chart.bundle.min.js',
+      'libs/jquery-3.2.1/jquery.min.js',
+      'js/view-responses.js'
+   ];
    
    require('includes/header.php');
 
@@ -83,7 +89,8 @@
                      $question['question']);
 
       // display Choices with statistical data
-      print('<table class="choice">');
+      print('<section class="choice-table-holder">');
+      print('<table class="choice-table">');
          print('<thead>');
             print('<tr>');
                print('<th>Choices</th>');
@@ -101,7 +108,7 @@
             }
 
             foreach ($choices as $choice) {
-               print('<tr>');
+               print('<tr class="choice-row">');
                   printf('<th>%s</th>', $choice['choice']);
 
                   $no_of_times_chosen = $choice['no_of_times_chosen'];
@@ -117,11 +124,21 @@
          print('</tbody>');
          print('<tfoot>');
             print('<tr>');
-               print('<th>Total</th>');
-               printf('<td colspan="2">%d</td>', $total_chosen);
+               print('<th colspan="2">Total Responses</th>');
+               printf('<td><strong>%d</strong></td>', $total_chosen);
             print('</tr>');
          print('</tfoot>');
       print('</table>');
+      print('</section>');
+
+
+      // for each Question create a Pie Chart using 'chart.js'
+      // printf('<canvas id="chartForQuestion%d" width="400" height="400">',
+      //                $question['question_id']);
+      print('<section class="question-chart-holder">');
+         print('<canvas class="questionChart">');
+         print('</canvas>');
+      print('</section>');
 
       print('</section>');
    }
