@@ -39,7 +39,7 @@
          // if validation succeeds, then authenticate
          if (Database::authenticate($_POST['username'], $_POST['password'])) {
             print('login successful');
-            $_SESSION['username'] = 'haben';
+            $_SESSION['username'] = $_POST['username'];
             Utils::redirect('index.php');
          } else {
             // invalid username and password combination, set flag to display error
