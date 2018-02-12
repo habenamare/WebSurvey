@@ -67,15 +67,17 @@
 <div id="loadingMessage">Creating Survey, Please wait...</div>
 <div id="creationMessage"></div>
 
-<button id="createSurveyButton">Create Survey</button>
-<br>
+<div id="create-survey-button">
+   <button id="createSurveyButton">Create Survey</button>
+</div>
 
-<label for="surveyName">Survey Name</label>
-<input type="text" id="surveyName">
-<br>
-<label for="expireDate">Expire Date</label>
-<input type="date" id="expireDate" value="<?php print(date('Y-m-d')); ?>">
-<br>
+<div id="survey-details">
+   <label for="surveyName">Survey Name</label>
+   <input type="text" id="surveyName">
+   &nbsp;&nbsp;&nbsp;&nbsp;
+   <label for="expireDate">Expire Date</label>
+   <input type="date" id="expireDate" value="<?php print(date('Y-m-d')); ?>">
+</div>
 
 <section id="respondents">
    <h2>Choose Respondent for this survey</h2>

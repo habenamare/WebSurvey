@@ -54,7 +54,9 @@
    }
 ?>
 
-<a href="new_survey.php" title="create new survey">create new</a>
+<div id="create-new-survey">
+   <a href="new_survey.php" title="create new survey" id="">create new</a>
+</div>
 
 <?php
    // get Surveys from the database
@@ -79,6 +81,7 @@
             print('<div class="survey-operations">');
             printf('<a href="view_responses.php?id=%d" title="view responses">View Responses</a>',
                      $survey['survey_id']);
+            print('&nbsp;&nbsp;');
             printf('<a href="delete_survey.php?id=%d" title="delete this survey"
                     class="delete-survey-button">Delete Survey</a>', $survey['survey_id']);
             print('</div>');
