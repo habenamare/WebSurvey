@@ -82,12 +82,20 @@
 <section id="respondents">
    <h2>Choose Respondent for this survey</h2>
    <?php
-      foreach (Database::get_respondents() as $respondent) {
-         printf('<input id="respondent%d" type="checkbox" name="respondent">', $respondent['respondent_id']);
-         printf('<label for="respondent%d">%s %s</label>', $respondent['respondent_id'],
-                     $respondent['first_name'], $respondent['last_name']);
-         printf('<br>');
+      $all_respondents = Database::get_respondents();
+
+      if ($all_respondents == Database::$EMPTY_RESULT_SET) {
+         print('<p>No Respondents. Please go to the <a href="respondents.php">Respondents page
+                                 </a> to create new Respondents.</p>');
+      } else {
+         foreach ($all_respondents as $respondent) {
+            printf('<input id="respondent%d" type="checkbox" name="respondent">', $respondent['respondent_id']);
+            printf('<label for="respondent%d">%s %s</label>', $respondent['respondent_id'],
+                        $respondent['first_name'], $respondent['last_name']);
+            printf('<br>');
+         }
       }
+
    ?>
 </section>
 
