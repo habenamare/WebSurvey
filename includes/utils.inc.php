@@ -12,9 +12,6 @@
    require_once(__DIR__ . '/../libs/PHPMailer-6.0.3/src/PHPMailer.php');
    require_once(__DIR__ . '/../libs/PHPMailer-6.0.3/src/SMTP.php');
 
-   // for DB access
-   require_once(__DIR__ . '/mariadb.inc.php');
-
    // get constants SENDING_EMAIL_ADDRESS and SENDING_EMAIL_PASSWORD which
    // are used as username and password respectively, when sending e-mails
    require(__DIR__ . '/../../../WebSurveyNotServed/email.config.php');
@@ -24,7 +21,7 @@
       // This module should be called when an error happens.
       // It takes a variable that describes the error as an argument. 
       public static function error_occured($some_error) {
-         exit('FROM Utility Class ' . $some_error);
+         exit('SOMETHING WENT WRONG, ' . $some_error);
       }
 
       // a function to redirect to another page
