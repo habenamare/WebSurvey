@@ -120,7 +120,7 @@
       }
 
       /* Returns an array containing a Survey with the given $survey_id.
-         Returns false or NULL if a $survey with that id doesn't exist or
+         Returns false or NULL if a Survey with that id doesn't exist or
          something goes wrong when fetching a Survey.
       */
       public static function get_survey($survey_id) {
@@ -148,7 +148,6 @@
       */
       public static function add_survey($name, $date_created, $expire_date,
                            $questions, $respondent_ids) {
-
          try {
 
             //=== start transaction
@@ -189,9 +188,6 @@
             //===
 
             //=== insert Respondents in SurveyRespondent while generating submission codes
-            /*-- populate $respondent_ids_with_codes with
-                 respondent_id as KEY and submission_code as VALUE */ 
-            $respondent_ids_with_codes = [];
             //-- get unique random strings for each Respondent
             $respondents_length = count($respondent_ids);
             $randoms = Utils::create_randoms($respondents_length);
@@ -208,19 +204,6 @@
                   $randoms[$i] 
                ]);
 
-               // populate $respondent_ids_with_codes
-               $r_id = $respondent_ids[$i];
-               $respondent_ids_with_codes[$r_id] = $randoms[$i];
-
-            }
-            //===
-            
-            //=== send e-mails
-            // if email sending is unsuccessful, rollback transaction
-            $sending_success = Utils::send_emails($respondent_ids_with_codes, $name, $created_survey_id);
-            if (!$sending_success) {
-               // e-mails sending failed
-               throw new Exception();
             }
             //===
 
@@ -244,24 +227,24 @@
          Returns NULL if trying to remove the Survey was unsuccessful.
       */
       public static function remove_survey($survey_id) {
-            $query = 'DELETE FROM Survey WHERE survey_id=?';
-   
-            try {
-               $statement = self::$conn->prepare($query);
-               // execute query using the given $survey_id and get rows
-               // affected by query
-               $statement->execute([$survey_id]);
-               $rows_affected = $statement->rowCount();
-               
-               if ($rows_affected == 1) {
-                  return true;
-               } else {
-                  return NULL;
-               }
-            } catch (PDOException $ex) {
+         $query = 'DELETE FROM Survey WHERE survey_id=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $survey_id and get rows
+            // affected by query
+            $statement->execute([$survey_id]);
+            $rows_affected = $statement->rowCount();
+            
+            if ($rows_affected == 1) {
+               return true;
+            } else {
                return NULL;
             }
-   
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
       }
 
 
@@ -378,7 +361,6 @@
          Returns NULL if something goes wrong. 
       */
       public static function get_respondents() {
-      
          try {
             $statement = self::$conn->query('SELECT * FROM Respondent');
             $respondents = $statement->fetchAll();
@@ -394,6 +376,55 @@
             return NULL;
          }
          
+      }
+
+      /* Returns an array containing Respondents that are associated with
+         the Survey of the given $survey_id.
+         The array contains respondent_id, first_name, last_name of the Respondent
+         and also the 'no_of_emails_sent' value of that Respondent when associated
+         with the Survey of the given $survey_id.
+         Returns NULL if something goes wrong.
+      */
+      public static function get_respondents_for_survey($survey_id) {    
+         $query = 'SELECT R.respondent_id, R.first_name, R.last_name, SR.submission_code, SR.no_of_emails_sent' . ' ' . 
+                  'FROM SurveyRespondent AS SR JOIN Respondent AS R' . ' ' .
+                                               'ON SR.respondent_id=R.respondent_id' .
+                  ' ' . 'WHERE SR.survey_id=?';
+         
+         try {
+            $statement = self::$conn->prepare($query);
+            $statement->execute([$survey_id]);
+              
+            $respondents = $statement->fetchAll();
+
+            // We don't check if $respondents is EMPTY because it is known
+            // that a Survey contains at least one Respondent.
+            return $respondents;
+
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
+
+      /* Returns an array containing a Respondent with the given $respondent_id.
+         Returns false or NULL if a Respondent with that id doesn't exist or
+         something goes wrong when fetching a Respondent.
+      */
+      public static function get_respondent($respondent_id) {
+         $query = 'SELECT * FROM Respondent WHERE respondent_id=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $respondent_id
+            $statement->execute([$respondent_id]);
+            
+            $respondent = $statement->fetch();
+            
+            return $respondent;
+         } catch (PDOException $ex) {
+            return NULL;
+         }
       }
 
       /* Adds a Respondent to the database using the given parameters.
@@ -437,7 +468,61 @@
 
       }
 
+
+      // --------------------------------------------------
+      // SurveyRespondent
+      // --------------------------------------------------
       
+      /* Returns the data inside the 'no_of_emails_sent' column of the
+         SurveyRespondent table, for the row containing the given $survey_id
+         and $respondent_id;
+         Returns NULL if something goes wrong when fetching the column data.
+      */
+      public static function get_no_of_emails_sent($survey_id, $respondent_id) {
+         $query = 'SELECT no_of_emails_sent FROM SurveyRespondent
+                   WHERE survey_id=? AND respondent_id=?';
+
+         try {
+            // execute SQL query using $username
+            $statement = self::$conn->prepare($query);
+            $statement->execute([ $survey_id, $respondent_id ]);
+            
+            return $statement->fetchColumn();
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
+
+      /* Returns true if the data inside the 'no_of_emails_sent' column
+         of the SurveyRespondent table, for the row containing the given
+         $survey_id and $respondent_id was successfully incremented.
+         Returns NULL if trying to increment the 'no_of_emails_sent'
+         column failed. 
+      */
+      public static function increment_no_of_emails_sent($survey_id, $respondent_id) {
+         $query = 'UPDATE SurveyRespondent SET no_of_emails_sent = no_of_emails_sent + 1
+                  WHERE survey_id=? AND respondent_id=?';
+
+         try {
+            $statement = self::$conn->prepare($query);
+            // execute query using the given $survey_id and $respondent_id
+            // and get rows affected by query
+            $statement->execute([ $survey_id, $respondent_id ]);
+            $rows_affected = $statement->rowCount();
+            
+            if ($rows_affected == 1) {
+               return true;
+            } else {
+               return NULL;
+            }
+         } catch (PDOException $ex) {
+            return NULL;
+         }
+
+      }
+
+
       // --------------------------------------------------
       // Reflect a Response in the database
       // --------------------------------------------------
@@ -532,7 +617,6 @@
          Returns false or NULL otherwise.
       */
       public static function add_response($survey_id, $submission_code, $choice_ids) {
-
          // check if the $submission_code and $survey_id pair exist in the database
          $combination_exists = Database::submission_code_exists($submission_code, $survey_id);
          if (!$combination_exists) {

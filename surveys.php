@@ -79,6 +79,9 @@
             printf('<h2>%s</h2>', $survey['name']);
 
             print('<div class="survey-operations">');
+            printf('<a href="send_emails.php?id=%d" title="send emails">Send Emails</a>',
+                     $survey['survey_id']);
+            print('&nbsp;&nbsp;');
             printf('<a href="view_responses.php?id=%d" title="view responses">View Responses</a>',
                      $survey['survey_id']);
             print('&nbsp;&nbsp;');

@@ -117,17 +117,14 @@
       }
       //===================================================================
 
-      //===================================================================
-      //=== functions to send e-mails to Respondents
-
       /* a function to send a single e-mail
          @param $respondent, array representing a single Respondent from the database
-         @param $survey_name, name of the Survey the Respondent can participate in
-         @param $submission_code, submission code needed to participate on the Survey
+         @param $survey, array representing a single Survey from the database
+         @param $submission_code, submission code needed by the Respondent to
+                                  participate on the Survey
          Returns true if email was sent successfully, returns false otherwise.
       */
-      public static function send_email($respondent, $survey_name, $survey_id,
-                                                            $submission_code) {
+      public static function send_email($respondent, $survey, $submission_code) {
          // configure settings to send e-mail
          $mail = new PHPMailer(true);
          
@@ -167,13 +164,13 @@
             $message_body = 
                '<div style="font-family: sans-serif; text-align: center;">' .
                '<h1 style="background: #dbdbdb;">' .
-                  $survey_name .
+                  $survey['name'] .
                '</h1>'.
-               '<p>We would really appreciate it if you take five minute of your' .
+               '<p>We would really appreciate it if you would take the' .
                '   time to complete this Survey.</p>' .
                '<p>Please ' .
                '<a href="localhost/WebSurvey/take_survey.php?id=' .
-                  $survey_id .
+                  $survey['survey_id'] .
                '" title="click here to take the survey"' .
                '  target="_blank">CLICK HERE</a> to go to the survey.</p>' .
                '<p>You need the submission code ' .
@@ -184,7 +181,7 @@
             // message in plain text form
             $message_plain_text = 'Currently, there is no plain text version of this email.';
 
-            $mail->Subject = 'Participate on ' . $survey_name  . '.';
+            $mail->Subject = 'Participate on ' . $survey['name']  . '.';
             $mail->Body = $message_body;
             $mail->AltBody = $message_plain_text;
          
@@ -198,43 +195,5 @@
          }
 
       }
-
-      /* a function to send e-mails to Respondents
-         @param $respondent_ids_with_codes, an array containing respondents ids
-                as KEY and unique submission codes as VALUE.
-         @param $survey_name, name of the Survey the Respondents will be participating
-         Returns true if e-mails were sent successfully, returns false if something
-         goes wrong.
-      */
-      public static function send_emails($respondent_ids_with_codes, $survey_name,
-                                                               $survey_id) {
-         $respondent_ids = array_keys($respondent_ids_with_codes);
-         $email_respondents = [];
-         
-         // obtain Respondents who will be receiving e-mails
-         $all_respondents = Database::get_respondents();
-         foreach ($all_respondents as $r) {
-            if ( in_array( $r['respondent_id'], $respondent_ids ) ) {
-               array_push($email_respondents, $r);
-            }
-         }
-
-         // send mail for each Respondent's e-mail
-         foreach ($email_respondents as $r) {
-            $r_id = $r['respondent_id'];
-            $submission_code = $respondent_ids_with_codes[$r_id];
-            $sent = self::send_email($r, $survey_name, $survey_id, $submission_code);
-            // if an e-mail could not be sent
-            if (!$sent) {
-               return false;
-            }
-
-         }
-         
-         // if all e-mail were sent successfully
-         return true;
-      }
-      //===================================================================
-
 
    }
