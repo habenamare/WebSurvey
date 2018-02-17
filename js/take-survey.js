@@ -201,7 +201,7 @@
          // hide the loading message
          $('#loadingMessage').hide();
          
-         // show the loading method when ajax starts and
+         // show the loading message when ajax starts and
          // hide when ajax stops
          $(document)
          .ajaxStart(function () {
