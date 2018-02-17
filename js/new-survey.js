@@ -566,8 +566,13 @@
       surveySuccess: function() {
          $('main').html(
             '<p style="color: green">Survey Created Successfully.</p>' +
-            '<a href="new_survey.php">Create Another Survey</a>' +
-            '<a href="surveys.php>Back to Surveys</a>'
+            '<p>' +
+               '<a href="new_survey.php">Create Another Survey</a>' +
+            '</p>' +
+            '<p>' +
+               '<a href="surveys.php">Go BACK to Surveys</a> ' +
+               ', to choose to <b>SEND EMAIL</b> or <b>VIEW RESPONSES</b>' +
+            '</p>'
          );
       },
 
