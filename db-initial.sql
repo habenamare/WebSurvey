@@ -15,7 +15,7 @@ VALUES ('admin', 'appropriate-hashed-password');
 -------------------------------------------------------------------
 CREATE TABLE Survey (
    survey_id    int            NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   name         varchar(60000) NOT NULL,
+   name         varchar(500)   NOT NULL UNIQUE,
    date_created date           NOT NULL,
    expire_date  date           NOT NULL
 );
@@ -26,7 +26,7 @@ CREATE TABLE Respondent (
    respondent_id int          NOT NULL AUTO_INCREMENT PRIMARY KEY,
    first_name    char(20)     NOT NULL,
    last_name     char(20)     NOT NULL,
-   email         varchar(254) NOT NULL
+   email         varchar(254) NOT NULL UNIQUE
 );
 INSERT INTO Respondent (respondent_id, first_name, last_name, email)
 VALUES (1, 'Haben', 'Amare', 'haben.amare@outlook.com');

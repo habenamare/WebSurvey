@@ -579,7 +579,9 @@
       // function to run when survey creation fails
       surveyFail: function() {
          $('#creationMessage').html(
-            '<p style="color: red">Survey could not be created. Please try again.</p>'
+            '<p style="color: red">Survey could not be created. Please try again.' +
+                                  ' Make sure that a Survey with the same name doesn\'t exist.' +
+            '</p>'
          );
       }
       

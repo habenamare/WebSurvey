@@ -99,7 +99,8 @@
       printf('<p class="success-message">Respondent %s %s has been created.</p>',
                $_POST['first_name'], $_POST['last_name']);
    } else if ($respondent_creation_failed) {
-      print('<p class="error-message">Something went wrong when trying to create the respondent.</p>');
+      print('<p class="error-message">Something went wrong when trying to create the respondent.
+            Check if a respondent with the email you provided already exists.</p>');
    }
 ?>
 
